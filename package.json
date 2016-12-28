@@ -1,0 +1,19 @@
+{
+  "name": "serial-websocket-echo",
+  "version": "0.0.1",
+  "description": "Small commandline application that sends messages received from serialport thru websocket",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Metatavu/serial-websocket-echo.git"
+  },
+  "author": "Heikki Kurhinen",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Metatavu/serial-websocket-echo/issues"
+  },
+  "homepage": "https://github.com/Metatavu/serial-websocket-echo#readme"
+}
