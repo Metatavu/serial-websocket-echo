@@ -1,6 +1,8 @@
 const commandLineArgs = require('command-line-args');
 const getUsage = require('command-line-usage');
 const SerialPort = require('serialport');
+const WebSocketServer = require('websocket').server;
+const http = require('http');
 
 const optionDefinitions = [
   { name: 'help', alias: 'h', type: Boolean, description: 'display this help text' },
@@ -31,7 +33,41 @@ if (options.help || !options.device || isNaN(options.baudrate) || isNaN(options.
     if (err) {
       console.error('Error connecting to serialport: ', err.message);
     } else {
+      console.log('Connected to device, starting server...');
+      var connections = [];
+
+      var server = http.createServer((req, res) => {
+        res.writeHead(404);
+        res.end();
+      });
+
+      server.listen(options.port, () => {
+        console.log('Listening to: ' + options.port);
+      });
+
+      var wsServer = new WebSocketServer({
+        httpServer: server,
+        autoAcceptConnections: true
+      });
+
+      wsServer.on('connection', (connection) => {
+        connections.push(connection);
+        console.log(connection.remoteAddress + ' connected - Protocol Version ' + connection.webSocketVersion);
+
+        connection.on('close', () => {
+          console.log(connection.remoteAddress + ' disconnected');
+          var index = connections.indexOf(connection);
+          if (index !== -1) {
+            connections.splice(index, 1);
+          }
+        });
+      });
+
       port.on('data', (data) => {
+        console.log('Received data: ' + data);
+        connections.forEach(function (destination) {
+          destination.sendUTF(data);
+        });
       });
     }
   });

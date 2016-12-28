@@ -19,6 +19,7 @@
   "dependencies": {
     "command-line-args": "^3.0.5",
     "command-line-usage": "^3.0.8",
-    "serialport": "^4.0.7"
+    "serialport": "^4.0.7",
+    "websocket": "^1.0.23"
   }
 }
