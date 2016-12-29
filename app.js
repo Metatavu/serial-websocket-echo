@@ -1,7 +1,6 @@
 const commandLineArgs = require('command-line-args');
 const getUsage = require('command-line-usage');
 const SerialPort = require('serialport');
-const WebSocketServer = require('websocket').server;
 const http = require('http');
 
 const optionDefinitions = [
@@ -41,33 +40,19 @@ if (options.help || !options.device || isNaN(options.baudrate) || isNaN(options.
         res.end();
       });
 
-      server.listen(options.port, () => {
-        console.log('Listening to: ' + options.port);
-      });
+      var io = require('socket.io')(server);
 
-      var wsServer = new WebSocketServer({
-        httpServer: server,
-        autoAcceptConnections: true
-      });
-
-      wsServer.on('connection', (connection) => {
-        connections.push(connection);
-        console.log(connection.remoteAddress + ' connected - Protocol Version ' + connection.webSocketVersion);
-
-        connection.on('close', () => {
-          console.log(connection.remoteAddress + ' disconnected');
-          var index = connections.indexOf(connection);
-          if (index !== -1) {
-            connections.splice(index, 1);
-          }
-        });
+      io.on('connection', (socket) => {
+        console.log('client connected');
       });
 
       port.on('data', (data) => {
         console.log('Received data: ' + data);
-        connections.forEach(function (destination) {
-          destination.sendUTF(data);
-        });
+        io.emit('data-received', data);
+      });
+
+      server.listen(options.port, () => {
+        console.log('Listening to: ' + options.port);
       });
     }
   });
